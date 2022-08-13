@@ -37,7 +37,13 @@ class DBManagerPlugin:
         self.dlg = None
 
     def initGui(self):
-        self.action = QAction(QIcon(":/db_manager/icon"), QApplication.translate("DBManagerPlugin", "DB Manager"),
+        import time
+        # TIME
+        timenow = time.strftime("%Y-%m-%d--%Hh%M", time.localtime())
+        print(timenow + " initGui DB Manager Chx")
+    
+        self.action = QAction(QIcon(":/db_manager/actions/import"), 
+                      QApplication.translate("DBManagerPlugin CHX", "DB Manager CHX "+timenow), # CHX
                               self.iface.mainWindow())
         self.action.setObjectName("dbManager")
         self.action.triggered.connect(self.run)

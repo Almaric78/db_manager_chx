@@ -25,8 +25,8 @@ The content of this file is based on
 import functools
 
 from qgis.PyQt.QtCore import Qt, QSettings, QByteArray, QSize
-from qgis.PyQt.QtWidgets import QMainWindow, QApplication, QMenu, QTabWidget, QGridLayout, QSpacerItem, QSizePolicy, QDockWidget, QStatusBar, QMenuBar, QToolBar, QTabBar
-from qgis.PyQt.QtGui import QIcon, QKeySequence
+from qgis.PyQt.QtWidgets import QMainWindow, QApplication, QMenu, QTabWidget, QGridLayout, QSpacerItem, QSizePolicy, QDockWidget, QStatusBar, QMenuBar, QToolBar, QTabBar, QMessageBox
+from qgis.PyQt.QtGui import QIcon, QKeySequence, QAction
 
 from qgis.gui import QgsMessageBar
 from .info_viewer import InfoViewer
@@ -38,14 +38,23 @@ from .db_tree import DBTree
 from .db_plugins.plugin import BaseError
 from .dlg_db_error import DlgDbError
 
+# CHX
+from inspect import getmembers
+from pprint import pprint
+
 
 class DBManager(QMainWindow):
 
     def __init__(self, iface, parent=None):
         QMainWindow.__init__(self, parent)
         self.setAttribute(Qt.WA_DeleteOnClose)
-        self.setupUi()
         self.iface = iface
+        self.setupUi()
+        
+        # CHX 
+        # QMessageBox.information(None, "OK", "CHX".decode('utf-8'))
+        print("DBManager CHX ---")
+
 
         # restore the window state
         settings = QSettings()
@@ -124,6 +133,10 @@ class DBManager(QMainWindow):
         index = self.tabs.currentIndex()
         item = self.tree.currentItem()
         table = self.tree.currentTable()
+        
+        # CHX ?
+        # self.infoBar.pushMessage(self.tr("Version CHX"), # CHX
+                                     # QgsMessageBar.INFO, self.iface.messageTimeout())
 
         # enable/disable tabs
         self.tabs.setTabEnabled(self.tabs.indexOf(self.table), table is not None)
@@ -150,7 +163,7 @@ class DBManager(QMainWindow):
     def importActionSlot(self):
         db = self.tree.currentDatabase()
         if db is None:
-            self.infoBar.pushMessage(self.tr("No database selected or you are not connected to it."),
+            self.infoBar.pushMessage(self.tr("No database selected or you are not connected to it. CHX2"), # CHX
                                      QgsMessageBar.INFO, self.iface.messageTimeout())
             return
 
@@ -163,6 +176,25 @@ class DBManager(QMainWindow):
 
         dlg = DlgImportVector(None, db, outUri, self)
         dlg.exec_()
+
+
+    def minimizeActionSlot(self):
+        db = self.tree.currentDatabase()
+        if db is not None:
+            print(db.connName())
+        
+        item = self.tree.currentItem()
+        # pprint(getmembers(item)) # CHX
+        pprint(item.self.selectedIndexes())
+        print("LLL")
+        
+        self.tree.collapseAll()
+        schema = self.tree.currentSchema()
+        if schema is None:
+            self.infoBar.pushMessage(self.tr("CHX:Select the schema you want minimize.."), QgsMessageBar.INFO,
+                                     self.iface.messageTimeout())
+            return
+
 
     def exportActionSlot(self):
         table = self.tree.currentTable()
@@ -361,8 +393,8 @@ class DBManager(QMainWindow):
             widget.deleteLater()
 
     def setupUi(self):
-        self.setWindowTitle(self.tr("DB Manager"))
-        self.setWindowIcon(QIcon(":/db_manager/icon"))
+        self.setWindowTitle(self.tr("DB Manager - New CHX"))
+        self.setWindowIcon(QIcon(":/db_manager/actions/import"))
         self.resize(QSize(700, 500).expandedTo(self.minimumSizeHint()))
 
         # create central tab widget and add the first 3 tabs: info, table and preview
@@ -390,6 +422,7 @@ class DBManager(QMainWindow):
         self.layout.setContentsMargins(0, 0, 0, 0)
         spacerItem = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
         self.layout.addItem(spacerItem, 1, 0, 1, 1)
+        
         # init messageBar instance
         self.infoBar = QgsMessageBar(self.info)
         sizePolicy = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
@@ -410,7 +443,7 @@ class DBManager(QMainWindow):
 
         # create menus
         self.menuBar = QMenuBar(self)
-        self.menuDb = QMenu(self.tr("&Database"), self)
+        self.menuDb = QMenu(self.tr("&Database CHX"), self)
         self.menuBar.addMenu(self.menuDb)
         self.menuSchema = QMenu(self.tr("&Schema"), self)
         actionMenuSchema = self.menuBar.addMenu(self.menuSchema)
@@ -422,7 +455,7 @@ class DBManager(QMainWindow):
         self.setMenuBar(self.menuBar)
 
         # create toolbar
-        self.toolBar = QToolBar("Default", self)
+        self.toolBar = QToolBar("Default CHX", self)
         self.toolBar.setObjectName("DB_Manager_ToolBar")
         self.addToolBar(self.toolBar)
 
@@ -456,6 +489,9 @@ class DBManager(QMainWindow):
                                                      self.tr("&Import layer/file"), self.importActionSlot)
         self.actionExport = self.menuTable.addAction(QIcon(":/db_manager/actions/export"), self.tr("&Export to file"),
                                                      self.exportActionSlot)
+        self.actionMinimize = self.menuTable.addAction(QIcon(":/db_manager/actions/export"), self.tr("&CHX:Minimize"),
+                                                     self.minimizeActionSlot)
+                                                     
         self.menuTable.addSeparator()
         #self.actionShowSystemTables = self.menuTable.addAction(self.tr("Show system tables/views"), self.showSystemTables)
         #self.actionShowSystemTables.setCheckable(True)
@@ -467,3 +503,58 @@ class DBManager(QMainWindow):
         self.toolBar.addAction(self.actionSqlWindow)
         self.toolBar.addAction(self.actionImport)
         self.toolBar.addAction(self.actionExport)
+        self.toolBar.addAction(self.actionMinimize)
+        
+        # CHX
+        self.actionRun = QAction(
+              QIcon(":/plugins/plugin_reloader/reload.png"), 
+              u"DBManagerChxAction", 
+              self.iface.mainWindow()
+            )
+            
+        self.actionRun.setWhatsThis(u"DBManagerChxAction")
+        self.iface.addPluginToMenu("&DBManagerChxAction", self.actionRun)
+        self.iface.registerMainWindowAction(self.actionRun, self.theBestShortcutForDBManager())
+
+
+      # theBestShortcutForPluginReload
+    def theBestShortcutForDBManager(self):
+        ''' Try to find the best saved setting.
+            Note **the action name is variable**, so the "Keyboard Shortcuts" window
+            tends to save concurrent shortcuts:
+                  .../shortcuts/Reload plugin: plugin Foo=F5
+                  .../shortcuts/Reload plugin: plugin Bar=Ctrl+F5
+                  .../shortcuts/Reload plugin: plugin HelloWorld=Ctrl+Alt+Del
+            so we should find the recent one (not always possible) and remove the rest.
+        '''
+        DEFAULT = "Ctrl+B"
+        settings = QSettings()
+        settings.beginGroup('shortcuts')
+        # Find all saved shortcuts:
+        newKeyMe = 'DBManagerChx plugin'
+        keys = [key for key in settings.childKeys() if key.startswith(newKeyMe)]
+        if settings.contains(newKeyMe):
+            keys.append(newKeyMe)
+        if not len(keys):
+            # Nothing found in settings - fallback to default:
+            key = None
+            shortcut = DEFAULT
+        elif len(keys) == 1:
+            # Just one setting found, take that!
+            shortcut = settings.value(keys[0])
+        else:
+            # More then one old setting found. Take the best one and remove the rest.
+            if self.actionRun.text() in keys:
+                # The current action text found - let's hope it's the recent one...
+                key = self.actionRun.text()
+                shortcut = settings.value(key)
+            else:
+                # Otherwise take the first one
+                key = keys[0]
+                shortcut = settings.value(key)
+            # Remove redundant settings
+            for i in keys:
+                if i != key:
+                    settings.remove(i)
+        return shortcut
+

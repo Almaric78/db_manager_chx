@@ -23,7 +23,7 @@ The content of this file is based on
 """
 
 from qgis.PyQt.QtCore import Qt, pyqtSignal
-from qgis.PyQt.QtWidgets import QDialog, QWidget, QAction, QApplication, QInputDialog, QStyledItemDelegate
+from qgis.PyQt.QtWidgets import QDialog, QWidget, QAction, QApplication, QInputDialog, QStyledItemDelegate, QMessageBox
 from qgis.PyQt.QtGui import QKeySequence, QCursor, QClipboard, QIcon, QStandardItemModel, QStandardItem
 from qgis.PyQt.Qsci import QsciAPIs
 
@@ -80,9 +80,13 @@ class DlgSqlWindow(QWidget, Ui_Dialog):
 
         copyAction.triggered.connect(self.copySelectedResults)
 
-        self.btnExecute.clicked.connect(self.executeSql)
+        # Boutons 
+        self.btnExecute  .clicked.connect(self.executeSql)
         self.btnSetFilter.clicked.connect(self.setFilter)
-        self.btnClear.clicked.connect(self.clearSql)
+        self.btnClear    .clicked.connect(self.newReconnect) # Réaffectation CHX
+        self.btnClear.setText("CHX:newReconnect")
+        self.btnClear.setStyleSheet("font-weight: bold; color: blue")
+        
 
         self.presetStore.clicked.connect(self.storePreset)
         self.presetDelete.clicked.connect(self.deletePreset)
@@ -173,8 +177,31 @@ class DlgSqlWindow(QWidget, Ui_Dialog):
         self.editSql.setFocus()
         self.filter = ""
 
-    def executeSql(self):
+    def newReconnect(self):
+    
+        print("CHX newReconnect 1")
+        
+        # QMessageBox.information(None, "OK", "CHX:newReconnect".decode('utf-8'))
+        
+        db = self.db # currentDatabase()
+        if db is not None:
+            print("Avant : %s %s" % (db.connection().connectionName(), db.connection().typeNameString()))
+            print("Avant : %s %s" % (db.uri(), db.parent()))
 
+            #self.mainWindow.invokeCallback(db.reconnectActionSlot)
+            #db.reconnectActionSlot()
+            db.connection().reconnect()
+            db.refresh()
+            self.db = db
+            
+            print("Apres : %s %s" % (db.connection().connectionName(), db.connection().typeNameString()))
+            print("apres : %s %s" % (db.uri(), db.parent()))
+        
+        QMessageBox.information(None, "OK", "CHX:newReconnect:OK".decode('utf-8'))
+
+        
+    def executeSql(self):
+    
         sql = self._getSqlQuery()
         if sql == "":
             return

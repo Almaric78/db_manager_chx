@@ -39,6 +39,8 @@ try:
 except:
     isImportVectorAvail = False
 
+from inspect import getmembers
+from pprint import pprint
 
 class TreeItem(QObject):
     deleted = pyqtSignal()
@@ -48,6 +50,12 @@ class TreeItem(QObject):
         QObject.__init__(self, parent)
         self.populated = False
         self.itemData = data
+        
+        # print
+        # print
+        # pprint(getmembers(data)) # CHX
+        
+        
         self.childItems = []
         if parent:
             parent.appendChild(self)
@@ -142,6 +150,8 @@ class ConnectionItem(TreeItem):
         TreeItem.__init__(self, connection, parent)
         connection.changed.connect(self.itemChanged)
         connection.deleted.connect(self.itemDeleted)
+        
+        print(connection.connName) # CHX
 
         # load (shared) icon with first instance of table item
         if not hasattr(ConnectionItem, 'connectedIcon'):
@@ -171,11 +181,16 @@ class ConnectionItem(TreeItem):
         database = connection.database()
         database.changed.connect(self.itemChanged)
         database.deleted.connect(self.itemDeleted)
+        
+        # from pprint import pprint
 
         schemas = database.schemas()
         if schemas is not None:
             for s in schemas:
+                # print(s.data(0)) #CHX
+                # pprint(s)
                 SchemaItem(s, self)
+                # break
         else:
             tables = database.tables()
             for t in tables:
@@ -198,9 +213,36 @@ class SchemaItem(TreeItem):
         schema.changed.connect(self.itemChanged)
         schema.deleted.connect(self.itemDeleted)
 
+        # print(schema.name + '-') # CHX
+        
+        # pprint(getmembers(data)) # CHX
+        
+        # pprint(getmembers(parent)) # CHX
+        
+        schema.connexionNameMe = parent.itemData.connName
+        
+        if schema.name in ['de', 'public', 'conception', 'memory', 'fibercenter']:
+            # schema.name = schema.name.upper()
+            self.importantSchema = 1
+            print(schema.name + '-') # CHX
+        else:
+            self.importantSchema = 0
+            print(schema.name) # CHX
+            
+        # print(schema.connexionNameMe)
+
         # load (shared) icon with first instance of schema item
         if not hasattr(SchemaItem, 'schemaIcon'):
             SchemaItem.schemaIcon = QIcon(":/db_manager/icons/namespace.png")
+
+            # if schema.name in ['de', 'public', 'conception']:
+                # SchemaItem.schemaIcon = QIcon(":/db_manager/icons/view.png")
+            # else:
+                # SchemaItem.schemaIcon = QIcon(":/db_manager/icons/namespace.png")
+
+        if schema.name in ['de', 'public', 'conception']:
+            SchemaItem.schemaIconNew = QIcon(":/db_manager/icons/view.png")
+            
 
     def data(self, column):
         if column == 0:
@@ -208,7 +250,10 @@ class SchemaItem(TreeItem):
         return None
 
     def icon(self):
-        return self.schemaIcon
+        if self.importantSchema:
+            return self.schemaIconNew
+        else:
+            return self.schemaIcon
 
     def populate(self):
         if self.populated:
@@ -228,6 +273,16 @@ class TableItem(TreeItem):
         table.changed.connect(self.itemChanged)
         table.deleted.connect(self.itemDeleted)
         self.populate()
+        
+        table.schemaNameMe = parent.itemData.name
+
+        print(table.name) # CHX
+        # print("parent:" + parent.itemData.name + '  %s' % table.schemaNameMe) #OK 
+        # print("parent2:" + table.parent.itemData.name) #Ne fonctionne pas 
+        
+        # pprint(getmembers(parent)) # CHX
+
+        # pprint(getmembers(table)) # CHX
 
         # load (shared) icon with first instance of table item
         if not hasattr(TableItem, 'tableIcon'):

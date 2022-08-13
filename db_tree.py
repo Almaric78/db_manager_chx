@@ -29,6 +29,9 @@ from qgis.gui import QgsMessageBar, QgsMessageBarItem
 from .db_model import DBModel, PluginItem
 from .db_plugins.plugin import DBPlugin, Schema, Table
 
+from inspect import getmembers
+from pprint import pprint
+
 
 class DBTree(QTreeView):
     selectedItemChanged = pyqtSignal(object)
@@ -38,7 +41,7 @@ class DBTree(QTreeView):
         self.mainWindow = mainWindow
 
         self.setModel(DBModel(self))
-        self.setHeaderHidden(True)
+        self.setHeaderHidden(True) # CHX
         self.setEditTriggers(QTreeView.EditKeyPressed | QTreeView.SelectedClicked)
 
         self.setDragEnabled(True)
@@ -47,8 +50,10 @@ class DBTree(QTreeView):
 
         self.doubleClicked.connect(self.addLayer)
         self.selectionModel().currentChanged.connect(self.currentItemChanged)
+        
         self.expanded.connect(self.itemChanged)
         self.collapsed.connect(self.itemChanged)
+        
         self.model().dataChanged.connect(self.modelDataChanged)
         self.model().notPopulated.connect(self.collapse)
 
@@ -64,6 +69,7 @@ class DBTree(QTreeView):
 
     def currentItem(self):
         indexes = self.selectedIndexes()
+        # pprint(indexes)
         if len(indexes) <= 0:
             return
         return self.model().getItem(indexes[0])
@@ -127,10 +133,11 @@ class DBTree(QTreeView):
         if isinstance(item, (Table, Schema)):
             menu.addAction(self.tr("Rename"), self.rename)
             menu.addAction(self.tr("Delete"), self.delete)
+            menu.addAction(self.tr("CHX:Actualiser"), self.refreshItem)
 
             if isinstance(item, Table) and item.canBeAddedToCanvas():
                 menu.addSeparator()
-                menu.addAction(self.tr("Add to canvas"), self.addLayer)
+                menu.addAction(self.tr("Add to canvas" ), self.addLayer)
 
         elif isinstance(item, DBPlugin):
             if item.database() is not None:
@@ -173,6 +180,7 @@ class DBTree(QTreeView):
                 msgLabel.linkActivated.connect(self.mainWindow.iface.mainWindow().raise_)
                 self.mainWindow.infoBar.pushItem(QgsMessageBarItem(msgLabel, QgsMessageBar.WARNING))
 
+    # TODO
     def reconnect(self):
         db = self.currentDatabase()
         if db is not None:

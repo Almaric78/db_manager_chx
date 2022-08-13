@@ -118,7 +118,7 @@ class InfoViewer(QTextBrowser):
         self.setHtml(html)
 
     def _showSchemaInfo(self, schema):
-        html = u'<div style="background-color:#ffcccc;"><h1>&nbsp;%s</h1></div>' % schema.name
+        html = u'<div style="background-color:#ffcccc;"><h1>&nbsp;%s : %s</h1></div>' % (schema.connexionNameMe, schema.name)
         html += '<div style="margin-left:8px;">'
         try:
             html += schema.info().toHtml()
@@ -128,7 +128,7 @@ class InfoViewer(QTextBrowser):
         self.setHtml(html)
 
     def _showTableInfo(self, table):
-        html = u'<div style="background-color:#ccccff"><h1>&nbsp;%s</h1></div>' % table.name
+        html = u'<div style="background-color:#ccccff"><h1>&nbsp;%s . %s</h1></div>' % (table.schemaName(), table.name)
         html += '<div style="margin-left:8px;">'
         try:
             html += table.info().toHtml()

@@ -25,7 +25,7 @@ except AttributeError:
 
 class Ui_DbManagerDlgImportVector(object):
     def setupUi(self, DbManagerDlgImportVector):
-        DbManagerDlgImportVector.setObjectName(_fromUtf8("DbManagerDlgImportVector"))
+        DbManagerDlgImportVector.setObjectName(_fromUtf8("CHX:DbManagerDlgImportVector"))
         DbManagerDlgImportVector.resize(482, 496)
         self.verticalLayout = QtGui.QVBoxLayout(DbManagerDlgImportVector)
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
@@ -182,10 +182,10 @@ class Ui_DbManagerDlgImportVector(object):
         DbManagerDlgImportVector.setTabOrder(self.chkSpatialIndex, self.buttonBox)
 
     def retranslateUi(self, DbManagerDlgImportVector):
-        DbManagerDlgImportVector.setWindowTitle(_translate("DbManagerDlgImportVector", "Import vector layer", None))
+        DbManagerDlgImportVector.setWindowTitle(_translate("CHX:DbManagerDlgImportVector", "Import vector layer ME", None))
         self.label_5.setText(_translate("DbManagerDlgImportVector", "Input", None))
-        self.btnChooseInputFile.setText(_translate("DbManagerDlgImportVector", "...", None))
-        self.chkSelectedFeatures.setText(_translate("DbManagerDlgImportVector", "Import only selected features", None))
+        self.btnChooseInputFile.setText(_translate("DbManagerDlgImportVector", "..", None))
+        self.chkSelectedFeatures.setText(_translate("CHX:DbManagerDlgImportVector", "Import only selected features ME", None))
         self.btnUpdateInputLayer.setText(_translate("DbManagerDlgImportVector", "Update options", None))
         self.groupBox_3.setTitle(_translate("DbManagerDlgImportVector", "Output table", None))
         self.label_2.setText(_translate("DbManagerDlgImportVector", "Schema", None))

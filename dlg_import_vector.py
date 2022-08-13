@@ -32,6 +32,11 @@ from qgis.utils import iface
 
 from .ui.ui_DlgImportVector import Ui_DbManagerDlgImportVector as Ui_Dialog
 
+# CHX
+# from Tkinter import *
+# import tkMessageBox as messagebox
+from pprint import pprint
+
 
 class DlgImportVector(QDialog, Ui_Dialog):
     HAS_INPUT_MODE, ASK_FOR_INPUT_MODE = range(2)
@@ -42,6 +47,12 @@ class DlgImportVector(QDialog, Ui_Dialog):
         self.db = outDb
         self.outUri = outUri
         self.setupUi(self)
+        
+        # CHX
+        # messagebox.showwarning('Select File','Veuillez sElectionner un fichier')
+        print("CHX DlgImportVector")
+        
+        # QMessageBox.information(None, "OK", "CHX".decode('utf-8'))
 
         self.default_pk = "id"
         self.default_geom = "geom"
@@ -253,6 +264,9 @@ class DlgImportVector(QDialog, Ui_Dialog):
         self.cboEncoding.setCurrentIndex(2)
 
     def accept(self):
+    
+        QMessageBox.information(None, "OK", "ACCEPT".decode('utf-8'))
+        
         if self.mode == self.ASK_FOR_INPUT_MODE:
             # create the input layer (if not already done) and
             # update available options
@@ -328,7 +342,7 @@ class DlgImportVector(QDialog, Ui_Dialog):
                 uri = self.outUri.uri(False)
 
             if self.chkDropTable.isChecked():
-                options['overwrite'] = True
+                options['overwrite'] = True # CHX
 
             if self.chkSinglePart.isEnabled() and self.chkSinglePart.isChecked():
                 options['forceSinglePartGeometryType'] = True
@@ -349,8 +363,14 @@ class DlgImportVector(QDialog, Ui_Dialog):
                 self.inLayer.setProviderEncoding(enc)
 
             onlySelected = self.chkSelectedFeatures.isChecked()
+            
+            print("layer", self.inLayer)
+            print("uri", uri)
+            print("providerName", providerName)
+            
+            pprint(options)
 
-            # do the import!
+            # do the import! CHX CHX ME
             ret, errMsg = QgsVectorLayerImport.importLayer(self.inLayer, uri, providerName, outCrs, onlySelected, False, options)
         except Exception as e:
             ret = -1
@@ -376,7 +396,7 @@ class DlgImportVector(QDialog, Ui_Dialog):
 
         self.db.connection().reconnect()
         self.db.refresh()
-        QMessageBox.information(self, self.tr("Import to database"), self.tr("Import was successful."))
+        QMessageBox.information(self, self.tr("Import to database"), self.tr("CHX:Import was successful."))
         return QDialog.accept(self)
 
     def closeEvent(self, event):
